@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="styles.css" />
+    <!-- TensorFlow.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+
+    <!-- Teachable Machine Image Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+    <style>
+      #videoElement {
+        width: 500px;
+        height: 400px;
+        background-color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <video id="videoElement" autoplay playsinline></video>
+
+    <script>
+      var video = document.querySelector("#videoElement");
+
+      // Solicitar acceso a la cámara web
+      if (navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices
+          .getUserMedia({ video: true })
+          .then(function (stream) {
+            video.srcObject = stream;
+            // El método play() se llama automáticamente cuando los metadatos del video están listos
+          })
+          .catch(function (error) {
+            console.error("Error al acceder a la cámara: ", error);
+          });
+      } else {
+        console.error(
+          "La API getUserMedia no es compatible con este navegador."
+        );
+      }
+    </script>
+  </body>
+</html>
