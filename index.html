@@ -3,12 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Clasificación en tiempo real</title>
     <link rel="stylesheet" href="styles.css" />
-    <!-- TensorFlow.js -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
-
-    <!-- Teachable Machine Image Library -->
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
     <style>
       #videoElement {
@@ -16,30 +13,68 @@
         height: 400px;
         background-color: #666;
       }
+      #resultado {
+        margin-top: 20px;
+        font-size: 24px;
+        font-weight: bold;
+      }
     </style>
   </head>
   <body>
     <video id="videoElement" autoplay playsinline></video>
+    <div id="resultado">Esperando predicción...</div>
 
     <script>
-      var video = document.querySelector("#videoElement");
+      const MODEL_URL = "https://teachablemachine.withgoogle.com/models/dJNd3vMnK/";
+      let model, maxPredictions;
+      const video = document.getElementById("videoElement");
+      const resultadoDiv = document.getElementById("resultado");
 
-      // Solicitar acceso a la cámara web
-      if (navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices
-          .getUserMedia({ video: true })
-          .then(function (stream) {
-            video.srcObject = stream;
-            // El método play() se llama automáticamente cuando los metadatos del video están listos
-          })
-          .catch(function (error) {
-            console.error("Error al acceder a la cámara: ", error);
-          });
-      } else {
-        console.error(
-          "La API getUserMedia no es compatible con este navegador."
-        );
+      // Inicializar la cámara
+      async function initCamera() {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          video.srcObject = stream;
+        } catch (error) {
+          console.error("Error al acceder a la cámara: ", error);
+        }
       }
+
+      // Cargar el modelo
+      async function initModel() {
+        const modelURL = MODEL_URL + "model.json";
+        const metadataURL = MODEL_URL + "metadata.json";
+        model = await tmImage.load(modelURL, metadataURL);
+        maxPredictions = model.getTotalClasses();
+        console.log("Modelo cargado correctamente");
+      }
+
+      // Función para predecir
+      async function predictLoop() {
+        if (model) {
+          const prediction = await model.predict(video);
+          // Encontrar la clase con mayor probabilidad
+          let maxProb = 0;
+          let clase = "";
+          prediction.forEach(p => {
+            if (p.probability > maxProb) {
+              maxProb = p.probability;
+              clase = p.className;
+            }
+          });
+          resultadoDiv.innerText = `Clase: ${clase} (${(maxProb * 100).toFixed(2)}%)`;
+        }
+        requestAnimationFrame(predictLoop); // Llamar continuamente
+      }
+
+      // Inicializar todo
+      async function init() {
+        await initCamera();
+        await initModel();
+        predictLoop();
+      }
+
+      init();
     </script>
   </body>
 </html>
