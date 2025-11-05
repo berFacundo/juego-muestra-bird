@@ -28,12 +28,21 @@ initModel();
 
 //Codigo del juego Flappy Bird
 
-
 //Variables globales del juego
 let boardWidth = 940;           //Ancho del canvas el juego
 let boardHeight = 640;          //Alto del canvas del juego
+
 let backgroundImg = new Image();    //Definicion del fondo
-backgroundImg.src = "./Sprites/flappybirdbg.png";    //Ruta de la imagen del fondo
+backgroundImg.src = "./Sprites/flappybirdbg.jpg";    //Ruta de la imagen del fondo
+
+// Imagen y variables del pasto
+let grassImg = new Image();
+grassImg.src = "./Sprites/flappybirdgrass.png"; // <-- Ruta a tu imagen de pasto
+
+let grassX = 0;              // Posición X del pasto 
+let grassY = boardHeight - 80; // Posición Y del pasto 
+let grassSpeed = 4;          // Velocidad de desplazamiento 
+
 let inputLocked = false;        //Variable para bloquear temporalmente el input
 
 document.addEventListener("keydown", handleKeyDown);        //Interaccion con el juego, al presionar una tecla
@@ -180,6 +189,22 @@ function renderGame() {         //Funcion que renderiza el juego, se encarga del
     if (backgroundImg.complete) {
         context.drawImage(backgroundImg, 0, 0, boardWidth, boardHeight);        //Renderiza el fondo
     }
+
+        // === ANIMACIÓN DEL PASTO ===
+    if (grassImg.complete) {
+        grassX -= grassSpeed;
+
+        // Dibuja dos imágenes seguidas para simular bucle continuo
+        context.drawImage(grassImg, grassX, grassY, boardWidth, 80);
+        context.drawImage(grassImg, grassX + boardWidth, grassY, boardWidth, 80);
+
+        // Reinicia posición cuando sale del canvas
+        if (grassX <= -boardWidth) {
+            grassX = 0;
+        }
+    }
+
+    //Movimniento del pajaro
     velocityY += gravity;                 //Aplica gravedad a la velocidad vertical del pajaro
     bird.y = Math.max(bird.y + velocityY, 0);   //Actualiza la posicion del pajaro, se asegura de que no se salga del canvas
 
