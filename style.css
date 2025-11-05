@@ -1,3 +1,10 @@
+@font-face {
+    font-family: Flappy;
+    src: url(./fuentes/FlappyBirdy.ttf);
+    font-weight: bold;
+    font-style: normal;
+}
+
 body {
     font-family: 'Courier New', Courier, monospace;
     text-align: center;
