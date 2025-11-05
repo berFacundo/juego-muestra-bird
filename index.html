@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles.css" />
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+    <script src="script.js"></script>
     <style>
       #videoElement {
         width: 500px;
@@ -21,6 +22,7 @@
     </style>
   </head>
   <body>
+    <canvas id="board"></canvas>
     <video id="videoElement" autoplay playsinline></video>
     <div id="resultado">Esperando predicción...</div>
 
