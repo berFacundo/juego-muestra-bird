@@ -29,7 +29,7 @@ initModel();
 //Codigo del juego Flappy Bird
 
 //Variables globales del juego
-let boardWidth = 360;           //Ancho del canvas el juego
+let boardWidth = 940;           //Ancho del canvas el juego
 let boardHeight = 640;          //Alto del canvas del juego
 let backgroundImg = new Image();    //Definicion del fondo
 backgroundImg.src = "./Sprites/flappybirdbg.png";    //Ruta de la imagen del fondo
@@ -170,7 +170,20 @@ function renderGame() {         //Funcion que renderiza el juego, se encarga del
     }
     velocityY += gravity;                 //Aplica gravedad a la velocidad vertical del pajaro
     bird.y = Math.max(bird.y + velocityY, 0);   //Actualiza la posicion del pajaro, se asegura de que no se salga del canvas
-    context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);    //Renderiza el pajaro
+
+    // Animacion de rotacion del pajaro
+    context.save();  // Guardar el estado del canvas
+    
+    // Mover el origen al centro del pájaro
+    context.translate(bird.x + bird.width/2, bird.y + bird.height/2);
+    
+    // Calcular rotación basada en la velocidad vertical
+    let rotation = Math.max(Math.min(velocityY * 2.5, 90), -25) * Math.PI / 180;
+    context.rotate(rotation);
+
+    context.drawImage(birdImg, -bird.width/2, -bird.height/2, bird.width, bird.height);    //Renderiza el pajaro
+
+    context.restore();  // Restaurar el estado del canvas
 
     //Condicional para el gameover
     if(bird.y > board.height) {                 //Condicional, si el pajaro se sale por abajo del canvas
