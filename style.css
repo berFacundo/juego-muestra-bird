@@ -4,6 +4,6 @@ body {
 }
 
 #board {
-    background-image: url("./Images/flappybirdbg.png");
+    background-image: url("./Sprites/flappybirdbg.png");
     cursor: default;
 }
