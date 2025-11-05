@@ -165,6 +165,9 @@ function renderMenu() {         //Funcion que renderiza el menu
 }
 
 function renderGame() {         //Funcion que renderiza el juego, se encarga del mov. del pajaro, logica de tuberias, puntaje.
+    if(backgroundImg.complete) {
+        context.drawImage(backgroundImg, 0, 0, boardWidth, boardHeight);        //Renderiza el fondo
+    }
     velocityY += gravity;                 //Aplica gravedad a la velocidad vertical del pajaro
     bird.y = Math.max(bird.y + velocityY, 0);   //Actualiza la posicion del pajaro, se asegura de que no se salga del canvas
     context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);    //Renderiza el pajaro
@@ -206,7 +209,10 @@ function renderGame() {         //Funcion que renderiza el juego, se encarga del
 }
 
 //Funcion que renderiza el game over
-function renderGameOver() {     
+function renderGameOver() {    
+    if(backgroundImg.complete) {
+        context.drawImage(backgroundImg, 0, 0, boardWidth, boardHeight);        //Renderiza el fondo
+    } 
     if(gameOverImg.complete) {  //Condicional, si la imagen de gameover esta cargada
         let imgWidth = 400;         //Ancho de la imagen gameover
         let imgHeight = 80;         //Alto de la imagen gameover
