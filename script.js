@@ -35,6 +35,35 @@ let boardHeight = 640;          //Alto del canvas del juego
 let backgroundImg = new Image();    //Definicion del fondo
 backgroundImg.src = "./Sprites/flappybirdbg.jpg";    //Ruta de la imagen del fondo
 
+let moneda = new Audio('./Sonidos/Moneda.mp3');
+let golpe = new Audio('./Sonidos/Golpe.mp3');
+let muerte = new Audio('./Sonidos/muerte.mp3');
+
+// Pool = conjunto de instancias de audio, sirve para manejar sonidos que se repiten.
+// Mejor manejo de sonido de salto: pool para permitir reproducciones sobrepuestas.
+// (si el jugador salta repetidamente, se escucha varias veces el ruido, no espera a terminar.)
+
+const saltoPoolSize = 6; // Valor ajustable, maxima cantidad de sonidos simultaneos
+const saltoPool = [];    // Array que contiene las instancias de audio
+let saltoPoolIndex = 0;  // Indice 
+for (let i = 0; i < saltoPoolSize; i++) {
+    saltoPool.push(new Audio('./Sonidos/Salto.mp3'));
+}
+
+function playSalto() {
+    // Toma la siguiente instancia del pool, reinicia y reproduce
+    const s = saltoPool[saltoPoolIndex];
+    try {
+        s.currentTime = 0;
+    } catch (err) {
+        // Reinicia el array, esta en catch por si no esta cargado el sonido aun.
+    }
+    // Reproduce y avanza el índice 
+    s.play().catch(() => { /* silenciar errores de play() por políticas de autoplay */ });
+    saltoPoolIndex = (saltoPoolIndex + 1) % saltoPoolSize;
+}
+
+
 // Imagen y variables del pasto
 let grassImg = new Image();
 grassImg.src = "./Sprites/flappybirdgrass.png"; // <-- Ruta a tu imagen de pasto
@@ -251,14 +280,17 @@ function renderGame() {         //Funcion que renderiza el juego, se encarga del
         pipeArray.shift();
     }
 
-    // Renderiza el puntaje
+    // Renderiza el puntaje (en el centro)
     context.font = "45px Flappy";       // Fuente y tamaño
-    context.textAlign = "left";         // Alineación
+    context.textAlign = "center";       // Alineación: centro horizontal del canvas
+    context.textBaseline = "top";       // Posicionamiento vertical
     context.lineWidth = 6;              // Grosor del contorno
     context.strokeStyle = "black";      // Color del contorno
     context.fillStyle = "white";        // Color del texto
-    context.strokeText(score, 5, 45);   // Contorno
-    context.fillText(score, 5, 45);     // Relleno
+    const scoreX = boardWidth / 2;      // Centro horizontal del canvas
+    const scoreY = 10;                  // Separación desde el borde superior (ajustable)
+    context.strokeText(score, scoreX, scoreY);   // Contorno
+    context.fillText(score, scoreX, scoreY);     // Relleno
 
 }
 
@@ -276,7 +308,7 @@ function renderGameOver() {
         context.drawImage(gameOverImg, x, y, imgWidth, imgHeight);  //Renderiza la imagen de gameover centrada
 
         // Formato del puntaje final
-        let scoreText = `Your score: ${Math.floor(score)}`;     // Texto del puntaje final  
+        let scoreText = `Puntaje: ${Math.floor(score)}`;     // Texto del puntaje final  
         context.font = "45px Flappy";                           // Fuente y tamaño texto
         context.textAlign = "center";                           // Alineación
         context.lineWidth = 6;                                  // Grosor del contorno
@@ -304,6 +336,7 @@ function handleKeyDown(e) {
             resetGame();                                                  //Reiniciar el juego
             currentState = GAME_STATE.MENU;                                 //Volver al menu
         } else if (currentState === GAME_STATE.PLAYING) {                //Si estamos jugando
+            playSalto();
             velocityY = -6;                                                //Hacer que el pajaro salte
         }
     }
