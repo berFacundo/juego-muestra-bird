@@ -268,8 +268,9 @@ function renderGame() {     //Funcion que renderiza el juego, se encarga del mov
 
         //Condicional para detectar colisiones entre el pajaro y las tuberias
         if (detectCollision(bird, pipe)) {       //Si hubo una colision entre el pajaro y la tuberia
-            currentState = GAME_STATE.GAME_OVER;    //Activa el game over
-        }
+            currentState = GAME_STATE.DYING;    //Activa el game over (animacion de dying)
+            muerte.play();
+        }   
     }
 
     //Borra las tuberias que ya salieron del canvas
@@ -385,19 +386,29 @@ function renderDying() {
     velocityY += gravity;
     bird.y += velocityY;
 
+    // Evitar que el pájaro se entierre en el piso
+    if (bird.y + bird.height > boardHeight) {
+        bird.y = boardHeight - bird.height;
+    }
+
     // Rotación hacia abajo
     context.save();
     context.translate(bird.x + bird.width / 2, bird.y + bird.height / 2);
-    let rotation = Math.min(velocityY * 2.5, 90) * Math.PI / 180;
+    let rotation;
+    if (bird.y + bird.height >= boardHeight) {
+        rotation = 90 * Math.PI / 180;         // Fuerza rotación máxima al tocar el piso
+    } else {
+        rotation = Math.min(velocityY * 5, 90) * Math.PI / 180;
+    }
     context.rotate(rotation);
     context.drawImage(birdImg, -bird.width / 2, -bird.height / 2, bird.width, bird.height);
-    context.restore();
+    context.restore()
 
     // Cuando toca el piso, pasa a GAME_OVER después de un breve delay
     if (bird.y + bird.height >= boardHeight) {
         bird.y = boardHeight - bird.height;
         setTimeout(() => {
             currentState = GAME_STATE.GAME_OVER;
-        }, 700);
+        }, 400);
     }
 }
