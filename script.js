@@ -32,12 +32,15 @@ initModel();
 let boardWidth = 940;           //Ancho del canvas el juego
 let boardHeight = 640;          //Alto del canvas del juego
 
+let score = 0;             //Variable del puntaje
+let birdImg, topPipeImg, bottomPipeImg, playButtonImg, board, context;      //Variables de imagenes y canvas
+
 let backgroundImg = new Image();    //Definicion del fondo
 backgroundImg.src = "./Sprites/flappybirdbg.jpg";    //Ruta de la imagen del fondo
 
-let moneda = new Audio('./Sonidos/Moneda.mp3');
-let golpe = new Audio('./Sonidos/Golpe.mp3');
-let muerte = new Audio('./Sonidos/muerte.mp3');
+let moneda = new Audio('./Sonidos/Moneda.mp3');         //Definicion de variable del ruido de moneda
+let golpe = new Audio('./Sonidos/Golpe.mp3');           //Definicion de variable del ruido de golpe
+let muerte = new Audio('./Sonidos/muerte.mp3');         //Definicion de variable del ruido de muerte
 
 // Pool = conjunto de instancias de audio, sirve para manejar sonidos que se repiten.
 // Mejor manejo de sonido de salto: pool para permitir reproducciones sobrepuestas.
@@ -66,19 +69,21 @@ function playSalto() {
 
 // Imagen y variables del pasto
 let grassImg = new Image();
-grassImg.src = "./Sprites/flappybirdgrass.png"; // <-- Ruta a tu imagen de pasto
+grassImg.src = "./Sprites/flappybirdgrass.png"; // <-- Ruta a imagen de pasto
 
 let grassX = 0;              // Posición X del pasto 
-let grassY = boardHeight - 80; // Posición Y del pasto 
-let grassSpeed = 4;          // Velocidad de desplazamiento 
+let grassY = boardHeight - 280; // Posición Y del pasto 
+let grassSpeed = 6;          // Velocidad de desplazamiento 
 
 let inputLocked = false;        //Variable para bloquear temporalmente el input
 
 document.addEventListener("keydown", handleKeyDown);        //Interaccion con el juego, al presionar una tecla
 
-let GAME_STATE = {              //Estados del juego
+// Estados del juego
+let GAME_STATE = {
     MENU: "menu",
     PLAYING: "playing",
+    DYING: "dying",      // Nuevo estado para animación de muerte
     GAME_OVER: "gameOver"
 };
 let currentState = GAME_STATE.MENU;         //Arranca el juego en el menu
@@ -152,17 +157,6 @@ function createPipes() {        //funcion que crea las tuberias con gap random
     pipeArray.push(topPipe, bottomPipe);    //Agrega las tuberias al array de tuberias
 }
 
-// Cargar la fuente antes de iniciar el juego
-const flappyFont = new FontFace('Flappy', 'url(./fuentes/FlappyBirdy.ttf)');
-
-flappyFont.load().then((loadedFont) => {
-    document.fonts.add(loadedFont);
-    console.log('Fuente Flappy cargada correctamente');
-}).catch((error) => {
-    console.error('Error cargando la fuente Flappy:', error);
-});
-
-
 //Iniciar el juego
 window.onload = function () {                            //Funcion que inicia el juego, define el canvas y carga nuestros assets
     board = document.getElementById("board");           //Se conecta con el que esta definido en el HTML
@@ -193,6 +187,8 @@ function update() {                 //Funcion principal del juego, maneja los es
         renderMenu();
     } else if (currentState === GAME_STATE.PLAYING) {    //Condicional, si estamos jugando, renderiza el juego
         renderGame();
+    } else if (currentState === GAME_STATE.DYING) {      //Condicional, si estas muriendo, renderiza la animacion de muerte
+        renderDying();
     } else if (currentState === GAME_STATE.GAME_OVER) {  //Condicional, si estamos en gameover, renderiza gameover
         renderGameOver();
     }
@@ -214,46 +210,47 @@ function renderMenu() {         //Funcion que renderiza el menu
     }
 }
 
-function renderGame() {         //Funcion que renderiza el juego, se encarga del mov. del pajaro, logica de tuberias, puntaje.
+function renderGame() {     //Funcion que renderiza el juego, se encarga del mov. del pajaro, logica de tuberias, puntaje, etc.
     if (backgroundImg.complete) {
         context.drawImage(backgroundImg, 0, 0, boardWidth, boardHeight);        //Renderiza el fondo
     }
 
-        // === ANIMACIÓN DEL PASTO ===
+    // Animación del pasto
     if (grassImg.complete) {
         grassX -= grassSpeed;
 
-        // Dibuja dos imágenes seguidas para simular bucle continuo
-        context.drawImage(grassImg, grassX, grassY, boardWidth, 80);
-        context.drawImage(grassImg, grassX + boardWidth, grassY, boardWidth, 80);
+        //Dibuja las 2 imagenes seguidas para hacer un bucle
+        context.drawImage(grassImg, grassX, grassY, boardWidth, 280);
+        context.drawImage(grassImg, grassX + boardWidth, grassY, boardWidth, 280);
 
-        // Reinicia posición cuando sale del canvas
+        //Se reinicia cuando sale del canvas
         if (grassX <= -boardWidth) {
             grassX = 0;
         }
     }
 
-    //Movimniento del pajaro
-    velocityY += gravity;                 //Aplica gravedad a la velocidad vertical del pajaro
-    bird.y = Math.max(bird.y + velocityY, 0);   //Actualiza la posicion del pajaro, se asegura de que no se salga del canvas
+    // Movimiento del pájaro
+    velocityY += gravity;           //Aplica gravedad a la velocidad vertical del pajaro
+    bird.y = Math.max(bird.y + velocityY, 0); //Actualiza la posicion del pajaro, se asegura de que no se salga del canvas
 
-    // Animacion de rotacion del pajaro
-    context.save();  // Guardar el estado del canvas
+    // Animación de rotación del pájaro
+    context.save();               //Guarda el estado del canvas
 
-    // Mover el origen al centro del pájaro
-    context.translate(bird.x + bird.width / 2, bird.y + bird.height / 2);
+    context.translate(bird.x + bird.width / 2, bird.y + bird.height / 2);         // Mover el origen al centro del pájaro
 
     // Calcular rotación basada en la velocidad vertical
     let rotation = Math.max(Math.min(velocityY * 2.5, 90), -25) * Math.PI / 180;
     context.rotate(rotation);
 
-    context.drawImage(birdImg, -bird.width / 2, -bird.height / 2, bird.width, bird.height);    //Renderiza el pajaro
+    context.drawImage(birdImg, -bird.width / 2, -bird.height / 2, bird.width, bird.height);     //Renderiza el pajaro
 
-    context.restore();  // Restaurar el estado del canvas
+    context.restore();          //Restaura el estado del canvas
 
-    //Condicional para el gameover
-    if (bird.y > board.height) {                 //Condicional, si el pajaro se sale por abajo del canvas
-        currentState = GAME_STATE.GAME_OVER;    //activa el estado game over
+    //Condicional para el gameover (primero dying)
+    // Animación de muerte
+    if (bird.y > board.height) {    //Condicional, si el pajaro se sale por abajo del canvas
+        currentState = GAME_STATE.DYING; //activa el estado dying
+        muerte.play();
     }
 
     //Bucle para manejar todas las tuberias en el array, renderizarlas y sus colisiones
@@ -292,7 +289,7 @@ function renderGame() {         //Funcion que renderiza el juego, se encarga del
     context.strokeText(score, scoreX, scoreY);   // Contorno
     context.fillText(score, scoreX, scoreY);     // Relleno
 
-}
+    }
 
 //Funcion que renderiza el game over
 function renderGameOver() {
@@ -369,4 +366,38 @@ function detectCollision(a, b) {        //Funcion que define las colisiones
         a.x + a.width > b.x &&          //Se fija si la parte derecha del pajaro se superpone con la parte izquierda de la tuberia
         a.y < b.y + b.height &&         //Se fija si la parte superior del pajaro se superpone con la parte inferior de la tuberia
         a.y + a.height > b.y;           //Se fija si la parte inferior del pajaro se superpone con la parte superior de la tuberia
+}
+
+function renderDying() {
+    if (backgroundImg.complete) {
+        context.drawImage(backgroundImg, 0, 0, boardWidth, boardHeight);
+    }
+    if (grassImg.complete) {
+        context.drawImage(grassImg, grassX, grassY, boardWidth, 280);
+        context.drawImage(grassImg, grassX + boardWidth, grassY, boardWidth, 280);
+    }
+    for (let i = 0; i < pipeArray.length; i++) {
+        let pipe = pipeArray[i];
+        context.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height);
+    }
+
+    // Animación de caída del pájaro
+    velocityY += gravity;
+    bird.y += velocityY;
+
+    // Rotación hacia abajo
+    context.save();
+    context.translate(bird.x + bird.width / 2, bird.y + bird.height / 2);
+    let rotation = Math.min(velocityY * 2.5, 90) * Math.PI / 180;
+    context.rotate(rotation);
+    context.drawImage(birdImg, -bird.width / 2, -bird.height / 2, bird.width, bird.height);
+    context.restore();
+
+    // Cuando toca el piso, pasa a GAME_OVER después de un breve delay
+    if (bird.y + bird.height >= boardHeight) {
+        bird.y = boardHeight - bird.height;
+        setTimeout(() => {
+            currentState = GAME_STATE.GAME_OVER;
+        }, 700);
+    }
 }
