@@ -411,27 +411,4 @@ function renderDying() {
             currentState = GAME_STATE.GAME_OVER;
         }, 400);
     }
-
-    // Loop para controlar el salto por reconocimiento de mano
-    let lastHandState = false; // Para evitar múltiples saltos por frame
-
-    function handControlLoop() {
-        // Detecta si la mano está abierta
-        if (window.claseActual === "abierta") {
-            if (!lastHandState) { // Solo dispara si antes no estaba abierta
-                const event = new KeyboardEvent('keydown', { code: 'Space', key: ' ', keyCode: 32, which: 32 });
-                document.dispatchEvent(event);
-                lastHandState = true;
-            }
-        } else {
-            lastHandState = false;
-        }
-        
-        requestAnimationFrame(handControlLoop);
-    }
-
-    // Iniciar el loop después de cargar todo
-    window.addEventListener("load", () => {
-        handControlLoop();
-    });
-    }
+}

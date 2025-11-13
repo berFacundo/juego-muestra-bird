@@ -1,5 +1,3 @@
-// camara.js (reemplazar archivo completo)
-
 // Encapsulamos para evitar globals y exponemos lo mínimo necesario
 (() => {
   const MODEL_URL_CAM = "https://teachablemachine.withgoogle.com/models/dJNd3vMnK/";
@@ -35,7 +33,7 @@
     }
   }
 
-  // Variables de DOM (actualizadas después de crear)
+  // Variables de DOM
   let video;
   let resultadoDiv;
 
@@ -98,6 +96,29 @@
     }
   }
 
+  // Control de gestos
+  let lastHandState = false;
+  function handJumpLoop() {
+      if (window.claseActual === "Abierta") {
+          if (!lastHandState) {
+              const event = new KeyboardEvent('keydown', {
+                  code: 'Space',
+                  key: ' ',
+                  keyCode: 32,
+                  which: 32,
+                  bubbles: true,
+                  cancelable: true
+              });
+              document.dispatchEvent(event);
+              window.dispatchEvent(event);
+              lastHandState = true;
+          }
+      } else {
+          lastHandState = false;
+      }
+      requestAnimationFrame(handJumpLoop);
+  }
+
   // Inicializar todo cuando DOM listo
   async function init() {
     try {
@@ -109,6 +130,7 @@
       await initCamera();
       await initModel();
       predictLoop();
+      handJumpLoop(); // <-- Inicia el loop de salto por gesto
     } catch (err) {
       console.error("camara.js: init fallo:", err);
     }
@@ -122,4 +144,3 @@
     window.addEventListener("load", init);
   }
 })();
-    
