@@ -25,7 +25,6 @@ async function initModel() {
 // Llamar a la función para inicializar el modelo
 initModel();
 
-
 //Codigo del juego Flappy Bird
 
 //Variables globales del juego
@@ -40,7 +39,12 @@ backgroundImg.src = "./Sprites/flappybirdbg.jpg";    //Ruta de la imagen del fon
 
 let moneda = new Audio('./Sonidos/Moneda.mp3');         //Definicion de variable del ruido de moneda
 let golpe = new Audio('./Sonidos/Golpe.mp3');           //Definicion de variable del ruido de golpe
-let muerte = new Audio('./Sonidos/muerte.mp3');         //Definicion de variable del ruido de muerte
+let muerte = new Audio('./Sonidos/Muerte.mp3');         //Definicion de variable del ruido de muerte
+
+let golpePlayed = false;     // Golpe al comenzar a morir
+let muertePlayed = false;    // Ruido mientras cae
+let caidaAlta = false;       // Detecta si fue una caida desde alto
+let caidaMuerte = false;     // Para no repetir el sonido de muerte
 
 // Pool = conjunto de instancias de audio, sirve para manejar sonidos que se repiten.
 // Mejor manejo de sonido de salto: pool para permitir reproducciones sobrepuestas.
@@ -51,6 +55,21 @@ const saltoPool = [];    // Array que contiene las instancias de audio
 let saltoPoolIndex = 0;  // Indice 
 for (let i = 0; i < saltoPoolSize; i++) {
     saltoPool.push(new Audio('./Sonidos/Salto.mp3'));
+}
+
+//Funcion que maneja los ruidos al morir
+function ruidosMuerte() {
+    // Reproducir golpe al iniciar la muerte (solo una vez)
+    if (!golpePlayed) {
+        golpe.play();
+        golpePlayed = true;
+    }
+
+    // Si es una caída alta, reproducir muerte mientras cae (pero solo una vez)
+    if (caidaAlta && !caidaMuerte) {
+        muerte.play();
+        caidaMuerte = true;
+    }
 }
 
 function playSalto() {
@@ -250,7 +269,8 @@ function renderGame() {     //Funcion que renderiza el juego, se encarga del mov
     // Animación de muerte
     if (bird.y > board.height) {    //Condicional, si el pajaro se sale por abajo del canvas
         currentState = GAME_STATE.DYING; //activa el estado dying
-        muerte.play();
+        caidaAlta = false;          //No fue caida alta
+        ruidosMuerte();        // Maneja sonidos de muerte
     }
 
     //Bucle para manejar todas las tuberias en el array, renderizarlas y sus colisiones
@@ -270,7 +290,8 @@ function renderGame() {     //Funcion que renderiza el juego, se encarga del mov
         //Condicional para detectar colisiones entre el pajaro y las tuberias
         if (detectCollision(bird, pipe)) {       //Si hubo una colision entre el pajaro y la tuberia
             currentState = GAME_STATE.DYING;    //Activa el game over (animacion de dying)
-            muerte.play();
+            caidaAlta = true;       //Marca que fue caida alta
+            ruidosMuerte();         //Maneja los sonidos de muerte
         }   
     }
 
@@ -348,6 +369,10 @@ function startGame() {
     velocityY = 0;
     pipeArray = [];         //Reinicia las tuberias
     score = 0;              //Reinicia el puntaje
+    golpePlayed = false;        //Reinicia las variables relacionadas a los ruidos de muerte
+    muertePlayed = false;
+    caidaAlta = false;
+    caidaMuerte = false;
 
     //Condicional
     if (pipeIntervalId) {
@@ -361,6 +386,10 @@ function resetGame() {      //Funcion que reinicia el juego despues de perder
     bird.y = birdY;         //Reinicia la posicion del pajaro
     pipeArray = [];         //Reinicia las tuberias
     score = 0;              //Reinicia el puntaje
+    golpePlayed = false;        //Reinicia las variables relacionadas a los ruidos de muerte
+    muertePlayed = false;
+    caidaAlta = false;
+    caidaMuerte = false;
 }
 
 function detectCollision(a, b) {        //Funcion que define las colisiones
@@ -384,7 +413,7 @@ function renderDying() {
     }
 
     // Animación de caída del pájaro
-    golpe.play();
+    ruidosMuerte();
     velocityY += gravity;
     bird.y += velocityY;
 
