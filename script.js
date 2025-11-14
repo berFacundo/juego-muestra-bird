@@ -67,7 +67,7 @@ function ruidosMuerte() {
 
     // Si es una caída alta, reproducir muerte mientras cae (pero solo una vez)
     if (caidaAlta && !caidaMuerte) {
-        muerte.play();
+        setTimeout(muerte.play.bind(muerte), 300);  // Retraso para que quede con el golpe, 200ms de delay
         caidaMuerte = true;
     }
 }
