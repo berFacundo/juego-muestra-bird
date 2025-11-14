@@ -262,6 +262,7 @@ function renderGame() {     //Funcion que renderiza el juego, se encarga del mov
 
         //Condicional para sumar puntos si el pajaro paso la tuberia
         if (!pipe.passed && bird.x > pipe.x + pipe.width) {      //Si el pajaro paso la tuberia y no se habia contado antes
+            moneda.play();
             score += 0.5;          //Suma puntos 0.5 (par de tuberias = 1 punto)
             pipe.passed = true;     //Marca la tuberia como pasada
         }
@@ -383,6 +384,7 @@ function renderDying() {
     }
 
     // Animación de caída del pájaro
+    golpe.play();
     velocityY += gravity;
     bird.y += velocityY;
 
