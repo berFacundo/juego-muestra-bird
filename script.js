@@ -28,8 +28,8 @@ initModel();
 //Codigo del juego Flappy Bird
 
 //Variables globales del juego
-let boardWidth = 940;           //Ancho del canvas el juego
-let boardHeight = 640;          //Alto del canvas del juego
+let boardWidth = 1200;           //Ancho del canvas el juego
+let boardHeight = 600;          //Alto del canvas del juego
 
 let score = 0;             //Variable del puntaje
 let birdImg, topPipeImg, bottomPipeImg, playButtonImg, board, context;      //Variables de imagenes y canvas

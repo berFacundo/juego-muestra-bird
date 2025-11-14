@@ -1,36 +1,80 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Juego Bird con gestos</title>
-    <link rel="stylesheet" href="style.css" />
 
     <!-- Librerías -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
 
     <style>
-      #videoElement {
-        width: 500px;
-        height: 400px;
-        background-color: #666;
-      }
-      #resultado {
-        margin-top: 20px;
-        font-size: 24px;
-        font-weight: bold;
-      }
+        /* Contenedor que superpone cámara y juego */
+        #gameContainer {
+            position: relative;
+            width: 1200px;   /* Tiene que ser igual al ancho del juego */
+            height: 600px;  /*  Tiene que ser igual al alto del juego */
+            margin: 0 auto;
+        }
+
+        /* Cámara arriba del juego */
+        #videoElement {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.4;    /* Transparencia */
+            z-index: 2;      
+        }
+
+        /* Canvas del juego */
+        #board {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;      
+        }
+
+        #resultado {
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        @font-face {
+            font-family: Flappy;
+            src: url(./fuentes/FlappyBirdy.ttf);
+            font-weight: bold;
+            font-style: normal;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            text-align: center;
+        }
+
+        #board {
+            background-image: url("./Sprites/flappybirdbg.png");
+            cursor: default;
+        }
     </style>
 
-  </head>
+</head>
 
-  <body>
-    <canvas id="board"></canvas>
-    <video id="videoElement" autoplay playsinline></video>
+<body>
+    <div id="gameContainer">
+        <canvas id="board"></canvas>
+        <video id="videoElement" autoplay playsinline></video>
+    </div>
+
     <div id="resultado">Esperando predicción...</div>
-    
+
     <script src="script.js"></script>
     <script src="camara.js"></script>
-  </body>
+</body>
+
 </html>
