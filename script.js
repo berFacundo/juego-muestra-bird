@@ -1,5 +1,5 @@
 // URL del modelo de Teachable Machine
-const MODEL_URL = "https://teachablemachine.withgoogle.com/models/dJNd3vMnK/";
+const MODEL_URL = "https://teachablemachine.withgoogle.com/models/cM5GtYS_h/";
 
 // Variables globales para el modelo y el número de clases
 let model;
@@ -28,7 +28,7 @@ initModel();
 //Codigo del juego Flappy Bird
 
 //Variables globales del juego
-let boardWidth = 1200;           //Ancho del canvas el juego
+let boardWidth = 800;           //Ancho del canvas el juego
 let boardHeight = 600;          //Alto del canvas del juego
 
 let score = 0;             //Variable del puntaje
@@ -136,13 +136,13 @@ let bird = {                       //Define las propiedades del pajaro
 
 //Variables de fisicas y movimiento del juego
 let velocityY = 0;                  //Velocidad vertical del pajaro
-let gravity = 0.5;                  //Gravedad que afecta al pajaro      
+let gravity = 0.2;                  //Gravedad que afecta al pajaro      
 let birdY = boardHeight / 2;        //Posicion inicial en y del pajaro  
 
 //Variables de las tuberias
 let velocityX = -2;                 //Velocidad horizontal de las tuberias
 let pipeWidth = 50;                 //Ancho de las tuberias
-let pipeGap = 200;                  //Espacio entre las tuberias
+let pipeGap = 270;                  //Espacio entre las tuberias
 let pipeArray = [];                 //Array que contiene las tuberias, necesario para la logica y colisiones
 let pipeIntervalId;                 //Intervalo que genera las tuberias
 
@@ -379,7 +379,7 @@ function startGame() {
         clearInterval(pipeIntervalId);          //Borra la creacion de tuberias anterior
     }
 
-    pipeIntervalId = setInterval(placePipes, 1500);     //Define la creacion de tuberias. Cada 1.5 segundos
+    pipeIntervalId = setInterval(placePipes, 2200);     //Define la creacion de tuberias. Cada 2.2 segundos
 }
 
 function resetGame() {      //Funcion que reinicia el juego despues de perder

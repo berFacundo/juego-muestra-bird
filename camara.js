@@ -1,6 +1,6 @@
 // Encapsulamos para evitar globals y exponemos lo mínimo necesario
 (() => {
-  const MODEL_URL_CAM = "https://teachablemachine.withgoogle.com/models/dJNd3vMnK/";
+  const MODEL_URL_CAM = "https://teachablemachine.withgoogle.com/models/cM5GtYS_h/";
   let model = null;
   let maxPredictions = 0;
   const VIDEO_ID = "videoElement";
@@ -96,28 +96,25 @@
     }
   }
 
-  // Control de gestos
-  let lastHandState = false;
-  function handJumpLoop() {
-      if (window.claseActual === "Abierta") {
-          if (!lastHandState) {
-              const event = new KeyboardEvent('keydown', {
-                  code: 'Space',
-                  key: ' ',
-                  keyCode: 32,
-                  which: 32,
-                  bubbles: true,
-                  cancelable: true
-              });
-              document.dispatchEvent(event);
-              window.dispatchEvent(event);
-              lastHandState = true;
-          }
-      } else {
-          lastHandState = false;
-      }
-      requestAnimationFrame(handJumpLoop);
-  }
+function handJumpLoop() {
+    if (window.claseActual === "Abierta") {
+        const event = new KeyboardEvent('keydown', {
+            code: 'Space',
+            key: ' ',
+            keyCode: 32,
+            which: 32,
+            bubbles: true,
+            cancelable: true
+        });
+        document.dispatchEvent(event);
+        window.dispatchEvent(event);
+    }
+
+    requestAnimationFrame(handJumpLoop);
+}
+
+handJumpLoop();
+
 
   // Inicializar todo cuando DOM listo
   async function init() {
